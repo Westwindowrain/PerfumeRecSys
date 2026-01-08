@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>香水详情 - PerfumeRecSys</title>
+    <!-- 建议加版本号，避免缓存导致你看不到更新 -->
+    <link rel="stylesheet" href="/style.css?v=20251231_detailfix" />
+</head>
+
+<body class="page-detail">
+<!-- 复用首页 container 体系，保证左对齐基准一致 -->
+<div class="wrap container detail-wrap">
+    <h1 class="detail-title">香水详情</h1>
+
+    <div class="panel detail-panel">
+        <button id="btnBack" class="secondary">← 返回上一级</button>
+    </div>
+
+    <!-- 状态栏：默认隐藏；只有出错/警告才显示 -->
+    <pre id="status" class="status"></pre>
+
+    <!-- 顶部概览 -->
+    <div id="hero" class="card"></div>
+
+    <!-- 香调强度 -->
+    <div id="accords" class="card"></div>
+
+    <!-- 其它属性 -->
+    <div id="attrs" class="card"></div>
+</div>
+
+<script>
+    function $(id) { return document.getElementById(id); }
+
+    function getQuery(name) {
+      const u = new URL(location.href);
+      return u.searchParams.get(name);
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    // ✅ 状态栏：msg 为空则隐藏（更产品化）
+    function setStatus(msg, type) {
+      const box = $('status');
+      const text = (msg || '').trim();
+
+      if (!text) {
+        box.style.display = 'none';
+        box.textContent = '';
+        box.className = 'status';
+        return;
+      }
+
+      box.style.display = 'block';
+      box.className = type ? `status ${type}` : 'status';
+      box.textContent = text;
+    }
+
+    function toNum(x) {
+      const n = Number(x);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function clamp01(x) {
+      if (x === null) return null;
+      if (x < 0) return 0;
+      if (x > 1) return 1;
+      return x;
+    }
+
+    function fmtFixed(n, digits) {
+      const x = toNum(n);
+      if (x === null) return '-';
+      return x.toFixed(digits);
+    }
+
+    function fmtInt(n) {
+      const x = toNum(n);
+      if (x === null) return '-';
+      return String(Math.round(x));
+    }
+
+    function mapGender(g) {
+      const s = String(g || '').toLowerCase();
+      if (s === 'men') return '男士';
+      if (s === 'women') return '女士';
+      if (s === 'unisex') return '中性';
+      return g ? String(g) : '-';
+    }
+
+    function mapPriceLevel(v) {
+      const n = toNum(v);
+      if (n === 1) return '平价';
+      if (n === 2) return '中端';
+      if (n === 3) return '高端';
+      return v !== null && v !== undefined ? String(v) : '-';
+    }
+
+    function splitTags(s) {
+      const str = String(s || '').trim();
+      if (!str) return [];
+      return str.split(',').map(x => x.trim()).filter(Boolean);
+    }
+
+    function renderChips(tags) {
+      if (!tags || tags.length === 0) return '<span class="muted">无</span>';
+      return tags.map(t => `<span class="chip">${escapeHtml(t)}</span>`).join(' ');
+    }
+
+    // 0~5 星（允许小数）
+    function renderStars(score0to5) {
+      const s = toNum(score0to5);
+      if (s === null) return '<span class="muted">-</span>';
+      const v = Math.max(0, Math.min(5, s));
+      const full = Math.floor(v);
+      const half = (v - full >= 0.5) ? 1 : 0;
+      const empty = 5 - full - half;
+      const stars = '★'.repeat(full) + (half ? '☆' : '') + '✩'.repeat(empty);
+      return `<span class="stars">${stars}</span><span class="muted"> ${v.toFixed(1)}/5</span>`;
+    }
+
+    // ✅ 0~1 的强度条（如果字段为空，显示“-”且条为 0%）
+    function renderBar(label, value01) {
+      const v = clamp01(toNum(value01));
+      const pct = (v === null) ? 0 : Math.round(v * 100);
+      const text = (v === null) ? '-' : v.toFixed(2);
+
+      return `
+        <div class="barRow">
+          <div class="barLabel">${escapeHtml(label)}</div>
+          <div class="barTrack" aria-label="${escapeHtml(label)}强度">
+            <div class="barFill" style="width:${pct}%"></div>
+          </div>
+          <div class="barVal">${escapeHtml(text)}</div>
+        </div>
+      `;
+    }
+
+    async function loadPerfumeByIdFromList(id) {
+      // ✅ 快速方案：不动后端，直接拉列表再找
+      const res = await fetch('/api/perfumes');
+      const resp = await res.json();
+      const list = resp && resp.data ? resp.data : [];
+      const pid = Number(id);
+      return list.find(x => Number(x && x.id) === pid) || null;
+    }
+
+    function renderHero(p) {
+      const name = escapeHtml(p.name || '');
+      const brand = escapeHtml(p.brand || '');
+      const id = escapeHtml(String(p.id));
+
+      const gender = mapGender(p.gender);
+      const price = mapPriceLevel(p.price_level);
+
+      const rating = renderStars(p.rating);
+      const reviews = fmtInt(p.review_count);
+      const pop = fmtFixed(p.popularity, 2);
+
+      const longevity = fmtInt(p.longevity);
+      const sillage = fmtInt(p.sillage);
+
+      const mapx = fmtFixed(p.map_x, 3);
+      const mapy = fmtFixed(p.map_y, 3);
+
+      $('hero').innerHTML = `
+        <div class="title detail-hero-title">
+          <b class="detail-name">${name || '未命名香水'}</b>
+          <span class="muted">${brand}</span>
+          <span class="muted">#${id}</span>
+        </div>
+
+        <div class="kvGrid detail-kv">
+          <div class="kv"><span class="k">性别</span><span class="v">${escapeHtml(gender)}</span></div>
+          <div class="kv"><span class="k">价格档位</span><span class="v">${escapeHtml(price)}</span></div>
+          <div class="kv"><span class="k">留香</span><span class="v">${escapeHtml(longevity)} / 5</span></div>
+          <div class="kv"><span class="k">扩散</span><span class="v">${escapeHtml(sillage)} / 5</span></div>
+          <div class="kv"><span class="k">评分</span><span class="v">${rating}</span></div>
+          <div class="kv"><span class="k">评论数</span><span class="v">${escapeHtml(reviews)}</span></div>
+          <div class="kv"><span class="k">热度</span><span class="v">${escapeHtml(pop)}</span></div>
+          <div class="kv"><span class="k">香调坐标</span><span class="v">(${escapeHtml(mapx)}, ${escapeHtml(mapy)})</span></div>
+        </div>
+      `;
+    }
+
+    function renderAccords(p) {
+      $('accords').innerHTML = `
+        <div class="title"><b>香调强度（0~1）</b></div>
+        <div class="bars">
+          ${renderBar('花香 Floral', p.accord_floral)}
+          ${renderBar('木质 Woody', p.accord_woody)}
+          ${renderBar('柑橘 Citrus', p.accord_citrus)}
+          ${renderBar('甜香 Sweet', p.accord_sweet)}
+          ${renderBar('清新 Fresh', p.accord_fresh)}
+          ${renderBar('辛辣 Spicy', p.accord_spicy)}
+          ${renderBar('东方/琥珀 Oriental', p.accord_oriental)}
+        </div>
+        <div class="muted" style="margin-top:8px;">
+          提示：强度用于“相似推荐”计算，数值越高表示该香调在整体气味中越突出。
+        </div>
+      `;
+    }
+
+    function renderAttrs(p) {
+      const seasons = splitTags(p.season_tags);
+      const scenarios = splitTags(p.scenario_tags);
+
+      $('attrs').innerHTML = `
+        <div class="title"><b>标签与属性</b></div>
+
+        <div class="detail-sections">
+          <div class="section">
+            <div class="k">适用季节</div>
+            <div class="v">${renderChips(seasons)}</div>
+          </div>
+
+          <div class="section">
+            <div class="k">使用场景</div>
+            <div class="v">${renderChips(scenarios)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ===== 新增：注入详情页 Grid 样式（只注入一次）=====
+    function ensurePerfumeDetailLayoutStyles() {
+  const STYLE_ID = 'perfume-detail-grid-style-v4';
+  if (document.getElementById(STYLE_ID)) return;
+
+  const css = `
+  /* 让详情页整体在宽屏不至于“左窄右空”得太夸张：放大容器宽度并居中 */
+  .detail-wrap{
+    max-width: 1400px;     /* 你嫌还空就改 1600 */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .detail-grid{
+    display:grid;
+    grid-template-columns: 1fr 360px; /* 有海报：两列 */
+    gap:18px;
+    align-items:stretch;
+  }
+
+  .detail-grid #hero{ grid-column:1; }
+
+  .detail-grid .detail-poster{
+    grid-column:2;
+    padding:0;
+    overflow:hidden;
+    align-self:stretch;
+  }
+  .detail-grid .detail-poster img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  /* 第2/3块横跨两列 */
+  .detail-grid #accords,
+  .detail-grid #attrs{
+    grid-column:1 / -1;
+  }
+
+  /* ✅ 没海报：自动单列，不留右侧空白 */
+  .detail-grid.no-poster{
+    grid-template-columns: 1fr;
+  }
+  .detail-grid.no-poster .detail-poster{
+    display:none;
+  }
+
+  @media (max-width: 900px){
+    .detail-wrap{
+      max-width: 100%;
+    }
+    .detail-grid{
+      grid-template-columns:1fr;
+    }
+    .detail-grid .detail-poster{
+      grid-column:1;
+    }
+    .detail-grid .detail-poster img{
+      height:auto;
+      aspect-ratio:3/4;
+      object-fit:cover;
+    }
+    .detail-grid #accords,
+    .detail-grid #attrs{ grid-column:1; }
+  }
+  `;
+
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode(css));
+  document.head.appendChild(style);
+}
+
+
+    // ===== 新增：只改布局，不动三块卡片的内容 =====
+    function applyPerfumeDetailGridLayout(p) {
+  ensurePerfumeDetailLayoutStyles();
+
+  const hero = document.getElementById('hero');
+  const accords = document.getElementById('accords');
+  const attrs = document.getElementById('attrs');
+  if (!hero || !accords || !attrs) return;
+
+  const wrap = hero.parentElement;
+  if (!wrap) return;
+
+  // 生成海报 URL：与首页同规则
+  const id = (p && p.id != null) ? String(p.id) : '';
+  const posterUrl = id ? `/images/perfumes/${encodeURIComponent(id)}.jpg` : '';
+  const fallbackUrl = '/images/perfumes/placeholder.jpg';
+
+  // 工具：判断某个图片 URL 是否能成功加载
+  function probeImage(url) {
+    return new Promise((resolve) => {
+      if (!url) return resolve(false);
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    });
+  }
+
+  // 已经套过 grid：只更新海报并根据可用性切换 no-poster
+  async function updatePosterAndLayout(gridEl) {
+    const posterBox = gridEl.querySelector('.detail-poster');
+    const imgEl = posterBox ? posterBox.querySelector('img') : null;
+
+    // 先尝试 posterUrl，不行再尝试 fallbackUrl
+    const okPoster = await probeImage(posterUrl);
+    const okFallback = okPoster ? true : await probeImage(fallbackUrl);
+
+    if (!okPoster && !okFallback) {
+      // 两个都失败：彻底无图 -> 单列
+      gridEl.classList.add('no-poster');
+      return;
+    }
+
+    // 至少有一个可用：两列
+    gridEl.classList.remove('no-poster');
+
+    if (imgEl) {
+      imgEl.src = okPoster ? posterUrl : fallbackUrl;
+    }
+  }
+
+  // 如果已经是 detail-grid，就不用再搬 DOM
+  if (wrap.classList && wrap.classList.contains('detail-grid')) {
+    updatePosterAndLayout(wrap);
+    return;
+  }
+
+  // 创建 grid 容器，插入到 hero 原位置
+  const grid = document.createElement('div');
+  grid.className = 'detail-grid';
+  wrap.insertBefore(grid, hero);
+
+  // 搬入三块卡（不改内容）
+  grid.appendChild(hero);
+
+  // 插入海报卡（先占位，后面根据 probe 决定是否显示/是否单列）
+  const poster = document.createElement('div');
+  poster.className = 'card detail-poster';
+  poster.innerHTML = `
+    <img src="${escapeHtml(fallbackUrl)}"
+         alt="香水海报"
+         loading="lazy"
+         onerror="this.onerror=null;" />
+  `;
+  grid.appendChild(poster);
+
+  grid.appendChild(accords);
+  grid.appendChild(attrs);
+
+  // 根据实际图片是否存在，决定：两列 or 单列
+  updatePosterAndLayout(grid);
+}
+
+
+    // ===== 修改：main 里渲染完三块卡后再做布局改造 =====
+    async function main() {
+      const id = getQuery('id');
+      const pid = Number(id);
+      if (!Number.isFinite(pid)) {
+        setStatus('参数错误：缺少 id', 'error');
+        return;
+      }
+
+      $('btnBack').onclick = () => {
+        sessionStorage.setItem('lastSeedId', String(pid));
+        window.location.href = '/index.html';
+      };
+
+      setStatus('加载中…', 'info');
+
+      try {
+        const p = await loadPerfumeByIdFromList(pid);
+        if (!p) {
+          setStatus('未找到该香水（可能 id 不存在）', 'warn');
+          $('hero').innerHTML = '<div class="empty">未找到该香水</div>';
+          $('accords').innerHTML = '';
+          $('attrs').innerHTML = '';
+          return;
+        }
+
+        // ✅ 成功后：清空并隐藏状态栏
+        setStatus('', 'info');
+
+        // 先按你原逻辑渲染三块内容
+        console.log('[detail perfume object]', p);
+
+        renderHero(p);
+        renderAccords(p);
+        renderAttrs(p);
+
+        // ✅ 再做布局改造（不动内容）
+        applyPerfumeDetailGridLayout(p);
+
+      } catch (e) {
+        setStatus('加载失败：' + (e && e.message ? e.message : e), 'error');
+      }
+    }
+
+    // ✅ 只保留 main() 入口；删除了不存在的 initPerfumeDetailPage 绑定
+    main();
+</script>
+</body>
+</html>

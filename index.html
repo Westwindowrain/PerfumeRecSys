@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>PerfumeRecSys</title>
+    <link rel="stylesheet" href="/style.css?v=20251231_ui"/>
+</head>
+
+<body>
+<!-- 顶部导航：中文模式切换 -->
+<header class="topbar">
+    <div class="container topbar-inner">
+        <div class="brand">
+            <span class="dot"></span>
+            <span class="brand-text">PerfumeRecSys</span>
+        </div>
+
+        <nav class="nav">
+            <button id="navHome"    class="nav-btn active">首页</button>
+            <button id="navBal"     class="nav-btn">均衡推荐</button>
+            <button id="navOffice"  class="nav-btn">办公推荐</button>
+            <button id="navPopular" class="nav-btn">热门推荐</button>
+            <button id="navModel"   class="nav-btn">大模型推荐</button>
+        </nav>
+
+
+        <div class="top-actions">
+            <label class="debug-toggle">
+                <input id="debug" type="checkbox"/>
+                <span>调试</span>
+            </label>
+        </div>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container hero-inner">
+        <div class="hero-banner"></div>
+
+        <div class="hero-overlay">
+            <div class="hero-card">
+                <div class="hero-kicker">Perfume Recommendation</div>
+                <div class="hero-title">香水推荐系统</div>
+                <div class="hero-desc">
+                    使用方式：点击任意香水进入详情页，返回后将自动为该香水生成“种子相似推荐”。
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 主内容 -->
+<main class="main">
+    <div class="container">
+        <!-- 状态栏（产品化提示） -->
+        <pre id="status" class="statusbar info"></pre>
+
+        <!-- 推荐结果 -->
+        <div id="result"></div>
+    </div>
+</main>
+
+<script src="/app.js?v=20251231_ui"></script>
+</body>
+</html>

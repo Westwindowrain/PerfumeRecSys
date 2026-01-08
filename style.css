@@ -1,0 +1,1335 @@
+/* =========================
+   PerfumeRecSys UI Theme v0
+   目标风格：大横幅 + 分区 + 卡片网格
+   主背景色系：#9C9096（低饱和灰紫）
+   ========================= */
+
+/* ---------- 0. 全局变量 ---------- */
+:root {
+  /* 主背景与中性色 */
+  --bg: #9C9096;          /* 你指定的主背景色系 */
+  --bg-2: #f4f1f3;        /* 内容区浅底（让卡片更突出） */
+  --surface: rgba(255,255,255,0.82); /* 玻璃卡片底 */
+  --surface-solid: #ffffff;
+  --border: rgba(0,0,0,0.08);
+
+  /* 字体与文字颜色 */
+  --text: rgba(15, 15, 18, 0.92);
+  --muted: rgba(15, 15, 18, 0.62);
+  --subtle: rgba(15, 15, 18, 0.45);
+
+  /* 点缀色（不抢背景） */
+  --accent: #6d5f6a;      /* 深一点的灰紫 */
+  --accent-2: #b9aeb6;    /* 浅一点的灰紫 */
+  --chip: rgba(109, 95, 106, 0.12);
+
+  /* 阴影与圆角 */
+  --radius: 16px;
+  --radius-lg: 22px;
+  --shadow: 0 10px 30px rgba(0,0,0,0.12);
+  --shadow-soft: 0 8px 18px rgba(0,0,0,0.10);
+
+  /* 容器宽度 */
+  --container: 1180px;
+}
+
+/* ---------- 1. 基础重置 ---------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  line-height: 1.5;
+
+  /* 让背景不死板：加一点柔和渐变 */
+  background-image:
+    radial-gradient(1200px 600px at 20% 0%, rgba(255,255,255,0.20), transparent 60%),
+    radial-gradient(900px 500px at 80% 10%, rgba(0,0,0,0.08), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.08), transparent 55%);
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* 统一容器 */
+.container {
+  width: min(var(--container), calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* ---------- 2. 顶部导航 ---------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.55);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.brand .logo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 6px rgba(109,95,106,0.12);
+}
+
+.nav-links {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.nav-links a {
+  padding: 8px 10px;
+  border-radius: 12px;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.nav-links a:hover {
+  background: rgba(109,95,106,0.10);
+  color: var(--text);
+}
+
+.nav-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ---------- 3. 通用按钮 ---------- */
+.btn {
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.78);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-primary {
+  background: rgba(109,95,106,0.90);
+  color: #fff;
+  border-color: rgba(109,95,106,0.30);
+}
+
+.btn-primary:hover {
+  background: rgba(109,95,106,0.95);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---------- 4. Hero 横幅 ---------- */
+.hero {
+  padding: 18px 0 0;
+}
+
+.hero-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,0.30);
+  background: rgba(255,255,255,0.18);
+  min-height: 280px;
+}
+
+/* 这里就是你说的“海报/插图先空着但留位置” */
+.hero-poster-placeholder {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,0.18), rgba(0,0,0,0.06)),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.10) 0px,
+      rgba(255,255,255,0.10) 8px,
+      rgba(0,0,0,0.03) 8px,
+      rgba(0,0,0,0.03) 16px
+    );
+  filter: saturate(0.9);
+}
+
+/* Hero 右侧浮层 */
+.hero-overlay {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  width: min(360px, calc(100% - 48px));
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 20px;
+  padding: 18px 18px;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.hero-kicker {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+
+.hero-title {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.hero-subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---------- 5. 主内容区（浅底托起卡片） ---------- */
+.main {
+  margin-top: 18px;
+  background: var(--bg-2);
+  border-top-left-radius: 26px;
+  border-top-right-radius: 26px;
+  padding: 26px 0 44px;
+  box-shadow: 0 -10px 24px rgba(0,0,0,0.08);
+}
+
+/* ---------- 6. 分区标题 ---------- */
+.section {
+  margin-top: 22px;
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.section-kicker {
+  font-size: 12px;
+  color: var(--subtle);
+  letter-spacing: 0.2px;
+}
+
+.section-title {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 46px;
+  height: 3px;
+  border-radius: 999px;
+  margin-top: 8px;
+  background: rgba(109,95,106,0.35);
+}
+
+.section-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------- 7. 网格与卡片 ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+/* 卡片容器 */
+.card {
+  border-radius: var(--radius);
+  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--surface-solid);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+}
+
+.card-body {
+  padding: 18px 20px 20px;
+}
+
+/* 海报占位：固定比例（以后直接换成 img） */
+.poster {
+  width: 100%;
+  aspect-ratio: 3 / 4; /* 香水海报/瓶身图一般这种比例很舒服 */
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background: linear-gradient(180deg, rgba(109,95,106,0.10), rgba(0,0,0,0.02));
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: rgba(15, 15, 18, 0.35);
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+/* 标题、品牌等 */
+.item-title {
+  font-size: 15px;
+  font-weight: 900;
+  margin: 2px 0 4px;
+}
+
+.reasons {
+  padding-left: 18px;
+}
+
+.kv,
+.meta,
+.flags {
+  padding-left: 4px;
+}
+
+.item-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 10px;
+  min-height: 18px; /* 保持排版稳定 */
+}
+
+/* 香调/标签 chip */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: rgba(109,95,106,0.92);
+  font-weight: 700;
+  border: 1px solid rgba(109,95,106,0.14);
+}
+
+/* 底部轻信息：评分/销量等 */
+.item-meta {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--subtle);
+  font-size: 12px;
+}
+
+/* 可点击卡片（你后面要做“点卡片进详情页”就用这个类） */
+.card-link {
+  cursor: pointer;
+}
+
+/* ---------- 8. 分页（先把样式准备好，功能以后接） ---------- */
+.pagination {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+}
+
+.page-btn {
+  border: 1px solid rgba(0,0,0,0.10);
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.page-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(109,95,106,0.08);
+}
+
+.page-btn.active {
+  background: rgba(109,95,106,0.90);
+  color: #fff;
+  border-color: rgba(109,95,106,0.25);
+}
+
+.page-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hero-overlay {
+  padding: 24px 26px;   /* 原来是 18px，略小 */
+}
+
+/* ---------- 9. 状态条（你之前有 setStatus） ---------- */
+.statusbar {
+  margin: 14px 0 0;
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.78);
+  color: var(--muted);
+}
+
+.statusbar.info { }
+.statusbar.error {
+  background: rgba(255, 240, 240, 0.85);
+  color: rgba(120, 25, 25, 0.86);
+  border-color: rgba(120, 25, 25, 0.16);
+}
+.statusbar.ok {
+  background: rgba(240, 255, 245, 0.85);
+  color: rgba(20, 95, 45, 0.86);
+  border-color: rgba(20, 95, 45, 0.16);
+}
+
+/* ---------- 10. 页脚 ---------- */
+.footer {
+  margin-top: 30px;
+  padding: 18px 0;
+  color: rgba(255,255,255,0.70);
+  text-align: center;
+  font-size: 13px;
+}
+
+/* ---------- 11. 响应式 ---------- */
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .grid { grid-template-columns: repeat(3, 1fr); }
+  .hero-card { min-height: 240px; }
+}
+
+@media (max-width: 640px) {
+  .container { width: min(var(--container), calc(100% - 24px)); }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-overlay { right: 14px; bottom: 14px; }
+  .hero-title { font-size: 18px; }
+}
+
+/* =========================================================
+   Spacing Patch v1（页面间距统一规范补丁）
+   目的：解决“文字贴边”“块内容太挤”“像调试页”
+   用法：把本段追加到 style.css 文件最末尾
+   ========================================================= */
+
+/* ---------- 间距规范（可按需要微调） ---------- */
+:root{
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+
+  /* 页面安全边距（桌面） */
+  --page-gutter: 72px;   /* ✅ 关键：整体左右不贴边 */
+}
+
+/* 小屏幕下减少安全边距 */
+@media (max-width: 900px){
+  :root{ --page-gutter: 28px; }
+}
+@media (max-width: 640px){
+  :root{ --page-gutter: 18px; }
+}
+
+/* ---------- 1) 全局：让所有主内容“整体居中并留安全边距” ---------- */
+.container{
+  width: min(var(--container), calc(100% - var(--page-gutter)));
+  margin: 0 auto;
+}
+
+/* 兼容你以前可能还用到的 wrap/panel/tip/status/result：
+   这些如果存在，也给它们统一安全边距与圆角感 */
+.wrap{
+  width: min(var(--container), calc(100% - var(--page-gutter)));
+  margin: 0 auto;
+  padding: var(--space-6) 0;
+}
+.panel, .tip, .status{
+  margin-top: var(--space-4);
+  border-radius: var(--radius);
+}
+
+/* ---------- 2) Hero：右下角信息卡更“呼吸”，避免贴边 ---------- */
+.hero-card{
+  border-radius: var(--radius-lg);
+}
+.hero-overlay{
+  padding: var(--space-7) var(--space-7);
+  right: var(--space-7);
+  bottom: var(--space-7);
+}
+
+/* ---------- 3) 主内容区：每个 section 之间拉开 ---------- */
+.main{
+  padding-top: var(--space-7);
+  padding-bottom: calc(var(--space-8) + var(--space-6));
+}
+.section{
+  margin-top: var(--space-7);
+}
+
+/* 分区标题区域也不要贴边 */
+.section-head{
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+
+/* ---------- 4) 结果区：如果你的 JS 直接往 #result 塞东西，
+   这里给 result 自己也加一点内边距，避免最外层贴边 ---------- */
+#result{
+  padding: var(--space-2);
+}
+
+/* ---------- 5) 卡片内容：统一内边距（最核心的“贴边”修复） ---------- */
+.card{
+  border-radius: var(--radius);
+}
+
+/* 你主题里本来已经有 card-body，但你当前 renderItems 并没有输出 card-body，
+   所以我们同时兼容：
+   - .card-body（以后你改渲染就用它）
+   - .row / .main / .meta / .reasons / details 等（现在就能生效） */
+.card-body{
+  padding: var(--space-7) var(--space-7);
+}
+
+/* 兼容你当前 renderItems 的结构 */
+.card .row{
+  padding: var(--space-7) var(--space-7);
+}
+.card .row .main{
+  padding-right: var(--space-6);
+}
+.card .title{
+  margin-bottom: var(--space-3);
+  line-height: 1.35;
+}
+.card .meta{
+  margin-top: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  color: var(--muted);
+  font-size: 13px;
+}
+.card .actions{
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* 列表/理由：给足缩进，不要贴边 */
+.reasons{
+  margin: 0;
+  padding: 0 var(--space-7) var(--space-7) calc(var(--space-7) + 16px);
+}
+.reasons li{
+  margin: 6px 0;
+  color: var(--text);
+}
+
+/* 调试 details：也加安全边距 */
+details.debug{
+  margin: 0 var(--space-7) var(--space-7);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.70);
+}
+
+/* kv 行之间更松一点 */
+.kv{
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: 6px 0;
+}
+.kv .k{
+  color: var(--muted);
+  font-weight: 700;
+}
+.kv .v{
+  color: var(--text);
+  font-weight: 800;
+}
+
+/* ---------- 6) 状态条：统一 padding（你现在用 statusbar） ---------- */
+.statusbar{
+  padding: var(--space-6) var(--space-7);
+  border-radius: 18px;
+}
+
+/* ---------- 7) 详情页（perfume.html）通用修复：
+   你详情页很可能没有 .container 包裹，导致大量贴边。
+   我们用“低风险兜底选择器”：只要页面里有这些 id/class 就会自动生效。
+   你不用改 HTML，也能缓解贴边。 ---------- */
+
+/* 常见详情根容器（如果你有） */
+.detail, .detail-main, .detail-wrap, .page, .page-body{
+  width: min(var(--container), calc(100% - var(--page-gutter)));
+  margin: 0 auto;
+}
+
+/* 详情页最常见的“标题/段落/区块”贴边：直接给它们加安全 padding */
+h1, h2, h3{
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+p, .desc, .hint, .tip, .subtitle{
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+
+/* 如果详情页里出现大块白底（你截图那种），给它统一内边距 */
+.detail-card, .block, .panel, .box, .section-box{
+  padding: var(--space-7) var(--space-7);
+  border-radius: var(--radius);
+}
+
+/* 表格/列表在详情页里也要有缩进 */
+ul, ol{
+  padding-left: 22px;
+}
+
+/* ---------- 8) 小屏幕：卡片 padding 稍微回收 ---------- */
+@media (max-width: 640px){
+  .hero-overlay{
+    padding: var(--space-6) var(--space-6);
+    right: var(--space-5);
+    bottom: var(--space-5);
+  }
+  .card .row{
+    padding: var(--space-6) var(--space-6);
+  }
+  .reasons{
+    padding: 0 var(--space-6) var(--space-6) calc(var(--space-6) + 16px);
+  }
+  details.debug{
+    margin: 0 var(--space-6) var(--space-6);
+  }
+}
+/* =========================================================
+   Detail Page Spacing Patch（仅 perfume.html 生效）
+   依赖：perfume.html 的 body 上有 class="page-detail"
+   ========================================================= */
+
+.page-detail{
+  /* 让详情页整体不要贴屏幕边缘 */
+  padding: 24px 0 48px;
+}
+
+/* 详情页：统一“内容最大宽度 + 左右安全边距” */
+.page-detail .detail-container,
+.page-detail .container,
+.page-detail main,
+.page-detail .main,
+.page-detail #app,
+.page-detail #root,
+.page-detail #content,
+.page-detail #detail,
+.page-detail .content,
+.page-detail .wrap,
+.page-detail .page,
+.page-detail .page-body{
+  width: min(var(--container), calc(100% - 72px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 900px){
+  .page-detail .detail-container,
+  .page-detail .container,
+  .page-detail main,
+  .page-detail .main,
+  .page-detail #app,
+  .page-detail #root,
+  .page-detail #content,
+  .page-detail #detail,
+  .page-detail .content,
+  .page-detail .wrap,
+  .page-detail .page,
+  .page-detail .page-body{
+    width: calc(100% - 28px);
+  }
+}
+@media (max-width: 640px){
+  .page-detail .detail-container,
+  .page-detail .container,
+  .page-detail main,
+  .page-detail .main,
+  .page-detail #app,
+  .page-detail #root,
+  .page-detail #content,
+  .page-detail #detail,
+  .page-detail .content,
+  .page-detail .wrap,
+  .page-detail .page,
+  .page-detail .page-body{
+    width: calc(100% - 18px);
+  }
+}
+
+/* 详情页：所有“白色大块/卡片/面板”统一内边距（解决你截图里“文字紧贴圆角边缘”） */
+.page-detail .card,
+.page-detail .panel,
+.page-detail .box,
+.page-detail .block,
+.page-detail .section-box,
+.page-detail .detail-card,
+.page-detail .detail-section,
+.page-detail .detail-block,
+.page-detail .info,
+.page-detail .info-card,
+.page-detail .summary,
+.page-detail .kv-box,
+.page-detail article,
+.page-detail section{
+  padding: 26px 30px;
+}
+
+/* 如果你的详情页是“左右两列：左边字段，右边值”那种，通常会用 flex 或 table。
+   下面做一点行间距，让它更像内容站 */
+.page-detail .row,
+.page-detail .kv,
+.page-detail .line,
+.page-detail .item{
+  padding: 10px 0;
+}
+
+/* 详情页标题不要贴边 */
+.page-detail h1,
+.page-detail h2,
+.page-detail h3{
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+/* 详情页段落/列表统一缩进，避免贴边 */
+.page-detail p{
+  margin: 10px 0;
+}
+.page-detail ul,
+.page-detail ol{
+  margin: 10px 0;
+  padding-left: 22px;
+}
+
+/* 如果详情页里用了 table 展示属性，给单元格加 padding */
+.page-detail table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.page-detail td,
+.page-detail th{
+  padding: 10px 12px;
+  vertical-align: top;
+}
+
+/* 顶部导航：模式切换按钮 */
+.topbar { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
+.topbar-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; padding: 14px 0; }
+.brand { display:flex; align-items:center; gap:10px; }
+.brand .dot { width:10px; height:10px; border-radius:50%; background: rgba(0,0,0,0.35); }
+.brand-text { font-weight: 800; letter-spacing: 0.2px; }
+
+.nav { display:flex; gap:10px; align-items:center; }
+.nav-btn {
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.55);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.nav-btn:hover { transform: translateY(-1px); }
+.nav-btn.active {
+  background: rgba(15,15,18,0.78);
+  color: rgba(255,255,255,0.92);
+  border-color: rgba(15,15,18,0.78);
+}
+
+.debug-toggle { display:flex; align-items:center; gap:8px; color: rgba(15,15,18,0.70); font-weight: 700; }
+.debug-toggle input { transform: translateY(1px); }
+
+/* ===== Hero 稳定布局：横幅一定有高度，卡片一定能对齐 ===== */
+
+.hero {
+  padding: 22px 0 10px;
+}
+
+.hero .hero-inner {
+  position: relative;          /* 关键：让 overlay 的 absolute 以它为参照 */
+  border-radius: 26px;
+  overflow: hidden;
+}
+
+/* 横幅占位：必须有高度，否则会“看不见” */
+.hero-banner {
+  height: 320px;               /* 你可以改成 280/360 */
+  border-radius: 26px;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,0.20) 0px,
+    rgba(255,255,255,0.20) 14px,
+    rgba(0,0,0,0.06) 14px,
+    rgba(0,0,0,0.06) 28px
+  );
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+/* 卡片覆盖层：居中靠右（你截图就是右侧） */
+.hero-overlay {
+  position: absolute;
+  inset: 0;                    /* top/right/bottom/left 全 0 */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;   /* 靠右 */
+  padding: 22px;
+  pointer-events: none;        /* 避免挡住下面点击（可选） */
+}
+
+/* 介绍卡片本体 */
+.hero-card {
+  width: min(520px, 92%);
+  border-radius: 26px;
+  padding: 22px 24px;
+  background: rgba(255,255,255,0.86);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+  backdrop-filter: blur(8px);
+}
+
+/* 文案排版 */
+.hero-kicker { opacity: 0.7; font-size: 14px; margin-bottom: 8px; }
+.hero-title  { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+.hero-desc   { opacity: 0.85; line-height: 1.7; font-size: 16px; }
+.hero { position: relative; z-index: 1; }
+.main { position: relative; z-index: 2; margin-top: 18px; }
+
+/* ===== 状态提示区（产品化文案样式） ===== */
+
+.statusbar {
+  font-family: -apple-system, BlinkMacSystemFont,
+               "Segoe UI", "PingFang SC",
+               "Hiragino Sans GB", "Microsoft YaHei",
+               Helvetica, Arial, sans-serif;
+
+  font-size: 15px;
+  line-height: 1.75;
+  letter-spacing: 0.2px;
+
+  padding: 14px 18px;
+  margin-bottom: 18px;
+
+  border-radius: 16px;
+  white-space: pre-line;     /* 保留换行，但不走等宽 pre 风格 */
+
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(6px);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,0.06),
+    0 6px 18px rgba(0,0,0,0.06);
+
+  color: rgba(20,20,25,0.85);
+}
+
+/* 信息态（默认） */
+.statusbar.info {
+  background: rgba(255,255,255,0.78);
+}
+
+/* 错误态：更克制，不要大红大紫 */
+.statusbar.error {
+  background: rgba(255,235,235,0.85);
+  color: #8a1f1f;
+  box-shadow:
+    inset 0 0 0 1px rgba(200,60,60,0.18),
+    0 6px 18px rgba(200,60,60,0.08);
+}
+
+/* OK / 成功态 */
+.statusbar.ok {
+  background: rgba(235,248,240,0.85);
+  color: #1f6a3a;
+}
+
+/* 让“提示：”这一类前缀不那么抢眼 */
+.statusbar::first-line {
+  opacity: 0.75;
+}
+
+/* ===== 返回首页 / 返回推荐按钮 ===== */
+
+.back-btn,
+.back-link,
+button.back {
+  font-family: -apple-system, BlinkMacSystemFont,
+               "Segoe UI", "PingFang SC",
+               "Microsoft YaHei", sans-serif;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.65);
+  color: rgba(20,20,25,0.85);
+
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+/* hover：轻微抬起，不要“按钮感” */
+.back-btn:hover,
+.back-link:hover,
+button.back:hover {
+  background: rgba(255,255,255,0.85);
+  transform: translateY(-1px);
+}
+
+/* ===== 已加载香水提示 ===== */
+
+.seed-hint,
+.loaded-hint,
+.load-info {
+  margin-top: 12px;
+
+  font-family: -apple-system, BlinkMacSystemFont,
+               "Segoe UI", "PingFang SC",
+               "Microsoft YaHei", sans-serif;
+
+  font-size: 14px;
+  line-height: 1.6;
+
+  color: rgba(20,20,25,0.65);
+}
+
+/* 如果你想让香水名稍微突出 */
+.seed-hint b,
+.loaded-hint b {
+  font-weight: 600;
+  color: rgba(20,20,25,0.85);
+}
+
+/* ===== 详情页：返回按钮（兜底强制版） ===== */
+#backBtn, #backHome, #btnBack, #goBack,
+.back, .back-btn, .back-link,
+a.back, button.back,
+a[href*="index"], a[href="/"], a[href="./"], a[href="../"],
+main a:first-child, main button:first-child {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               "PingFang SC","Microsoft YaHei", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+
+  padding: 8px 14px !important;
+  border-radius: 999px !important;
+
+  background: rgba(255,255,255,0.70) !important;
+  color: rgba(20,20,25,0.85) !important;
+
+  border: 1px solid rgba(0,0,0,0.10) !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06) !important;
+
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+/* hover */
+#backBtn:hover, #backHome:hover, #btnBack:hover, #goBack:hover,
+.back:hover, .back-btn:hover, .back-link:hover,
+a.back:hover, button.back:hover {
+  background: rgba(255,255,255,0.90) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ===== 详情页：已加载提示（兜底强制版） ===== */
+#loaded, #loadInfo, #info, #hint, #seedInfo,
+.loaded, .loaded-hint, .seed-hint, .hint, .subhint,
+main p, main small {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               "PingFang SC","Microsoft YaHei", sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: rgba(20,20,25,0.65) !important;
+}
+
+/* =========================
+   Detail page layout polish
+   ========================= */
+.page-detail .container{
+  /* 左对齐版：不要居中卡太大空 */
+  max-width: 1120px;          /* 你想更紧凑可改 1000px */
+  margin-left: 40px;          /* 左侧留白（更“贴近左”，但不贴边） */
+  margin-right: 40px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* 标题“香水详情”更贴合左侧，和内容对齐 */
+.page-detail h1,
+.page-detail .page-title,
+.page-detail .title{
+  margin: 18px 0 10px 0;
+  letter-spacing: 0.2px;
+}
+
+/* 返回按钮：不要漂在中间，贴左并收紧和标题距离 */
+.page-detail a.back,
+.page-detail .back,
+.page-detail .btn-back{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 14px 0;       /* 缩小上下间距 */
+}
+
+/* 详情页的大白卡片（你图里那块）：左对齐，减少上方空 */
+.page-detail .card,
+.page-detail .panel,
+.page-detail .detail-card,
+.page-detail .detail{
+  margin-top: 12px;           /* 原来通常太大 */
+}
+
+/* 如果你的大白卡片内部左右太空/太挤：这里统一一下 */
+.page-detail .card,
+.page-detail .panel,
+.page-detail .detail-card{
+  padding: 26px 28px;
+}
+
+/* 卡片标题区：更紧凑 */
+.page-detail .card .header,
+.page-detail .detail-header{
+  margin-bottom: 12px;
+}
+
+/* 行间距：整体更紧凑但不拥挤 */
+.page-detail .kv,
+.page-detail .row,
+.page-detail .line{
+  margin: 8px 0;
+}
+
+/* 你那块“香调强度/标签属性”等分块：减少分块之间距离 */
+.page-detail h2,
+.page-detail h3,
+.page-detail .section-title{
+  margin: 18px 0 10px 0;
+}
+
+.page-detail .section,
+.page-detail .block{
+  margin-top: 14px;
+}
+
+/* 让“页面外层背景”与内容更协调（可选） */
+.page-detail .main{
+  padding-top: 14px;
+  padding-bottom: 28px;
+}
+
+/* =========================
+   Detail page: alignment + spacing
+   ========================= */
+
+/* 让详情页和首页同一套宽度/左对齐基准 */
+.page-detail .detail-wrap{
+  margin-top: 22px;
+}
+
+/* 标题与返回按钮更紧凑 */
+.page-detail h1{
+  margin: 0 0 14px 0;
+}
+
+.page-detail .panel{
+  margin: 0 0 14px 0;   /* 缩小和状态栏/卡片的距离 */
+  padding: 0;           /* panel 不要额外内边距 */
+  background: transparent; /* 如果 panel 有背景，直接去掉 */
+  border: none;         /* 如果 panel 有边框，直接去掉 */
+  box-shadow: none;
+}
+
+/* 返回按钮别太“飘”，贴合整体 */
+.page-detail #btnBack.secondary{
+  border-radius: 999px;
+  padding: 10px 14px;
+}
+
+/* 状态栏：默认不占空间；只有有内容才显示（配合 JS 更好） */
+.page-detail #status.status{
+  margin: 0 0 14px 0;
+}
+
+/* 卡片之间间距更紧凑 */
+.page-detail .card{
+  margin-top: 14px;
+}
+
+/* 如果你希望第一张卡片离上面更近 */
+.page-detail #hero.card{
+  margin-top: 0;
+}
+.hero-banner {
+  width: 100%;
+  height: 320px;              /* 可调 */
+  border-radius: 20px;
+  background-image: url("images/hero/hero.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.poster {
+  width: 100%;
+  height: 200px;
+  border-radius: 16px;
+  background-size: cover;
+  background-position: center;
+  background-color: #f2f2f2;
+}
+
+/* =========================
+   Detail Page Polish
+   只影响 perfume.html（body.page-detail）
+   ========================= */
+
+/* 1) 香调强度区：字体更统一、更柔和 */
+body.page-detail #accords {
+  /* 让卡片里的整体文字更接近“正文”风格 */
+  font-size: 15px;
+  line-height: 1.75;
+  letter-spacing: 0.2px;
+  color: rgba(20, 20, 20, 0.86);
+}
+
+body.page-detail #accords .title b {
+  /* 标题不突兀：稍微收一点字重 */
+  font-weight: 650;
+}
+
+body.page-detail #accords .bars {
+  margin-top: 10px;
+}
+
+/* 如果你现在还在用 barRow/barLabel/barVal 结构，这些会更好看；
+   如果页面只是普通文字（没有条形），也不会造成破坏 */
+body.page-detail #accords .barRow {
+  display: grid;
+  grid-template-columns: 160px 1fr 56px;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 0;
+}
+
+body.page-detail #accords .barLabel {
+  font-weight: 500;
+  color: rgba(20, 20, 20, 0.80);
+}
+
+body.page-detail #accords .barVal {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: rgba(20, 20, 20, 0.62);
+}
+
+/* 条形更细腻 */
+body.page-detail #accords .barTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+body.page-detail #accords .barFill {
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(30, 30, 30, 0.35);
+  transition: width 240ms ease;
+}
+
+/* 2) 标签 chips：更体面（圆角、边框、柔和背景、间距） */
+body.page-detail #attrs .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+  margin: 6px 8px 0 0;
+
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: rgba(255, 255, 255, 0.65);
+
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+
+  color: rgba(25, 25, 25, 0.70);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+body.page-detail #attrs .chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 0, 0, 0.18);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+/* 让“适用季节/使用场景”的块看起来更有层次 */
+body.page-detail #attrs .detail-sections .section .k {
+  font-weight: 650;
+  color: rgba(20, 20, 20, 0.78);
+  margin-bottom: 6px;
+}
+
+body.page-detail #attrs .detail-sections .section .v {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 空值“无”更柔和 */
+body.page-detail #attrs .muted {
+  color: rgba(20, 20, 20, 0.50);
+}
+
+/* =========================
+   Detail Page - 标签与属性 标题层级修正
+   ========================= */
+
+/* 「标签与属性」这一行 */
+body.page-detail #attrs > .title {
+  font-size: 18px;          /* 明确拉开与二级标题差距 */
+  font-weight: 700;         /* 稳重，不浮夸 */
+  letter-spacing: 0.4px;
+
+  color: rgba(15, 15, 15, 0.92);
+
+  margin-top: 0;            /* 防止被卡片内 padding 拉低 */
+  margin-bottom: 14px;      /* 与下面内容形成呼吸感 */
+
+  position: relative;
+  top: -4px;                /* 关键：整体微微上提 */
+}
+
+/* 「适用季节 / 使用场景」作为二级标题 */
+body.page-detail #attrs .section .k {
+  font-size: 14px;          /* 明确比“标签与属性”小 */
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  color: rgba(20, 20, 20, 0.78);
+  margin-bottom: 6px;
+}
+
+/* =========================
+   Detail Page - 顶部标题区层级重构
+   ========================= */
+
+/* 页面主标题「香水详情」 */
+body.page-detail .detail-title {
+  font-size: 80px;              /* 明显的大标题 */
+  font-weight: 800;
+  letter-spacing: 2px;
+
+  color: rgba(44, 37, 39, 0.95);
+
+  margin-bottom: 30px;          /* 与按钮拉开层级 */
+}
+
+/* 返回首页按钮（次级操作） */
+body.page-detail #btnBack {
+  font-size: 24px;              /* 明显小于标题 */
+  font-weight: 500;
+
+  padding: 12px 18px;
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.85);
+  color: rgba(30, 30, 30, 0.75);
+
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  transition: all 0.2s ease;
+}
+
+/* 悬浮态：给反馈，但不抢戏 */
+body.page-detail #btnBack:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: rgba(20, 20, 20, 0.9);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* 标题 + 按钮所在 panel 的整体节奏 */
+body.page-detail .detail-panel {
+  margin-bottom: 50px;          /* 与下面卡片拉开距离 */
+}
+
